@@ -1,0 +1,6 @@
+module Pods_iConnect {
+  umbrella header "Pods-iConnect-umbrella.h"
+
+  export *
+  module * { export * }
+}

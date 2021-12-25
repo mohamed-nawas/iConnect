@@ -1,0 +1,6 @@
+module Pods_iConnect_iConnectTests {
+  umbrella header "Pods-iConnect-iConnectTests-umbrella.h"
+
+  export *
+  module * { export * }
+}
