@@ -3,10 +3,14 @@ import { Image, Text, TextInput, View, TouchableOpacity } from "react-native";
 import CountryCodeModal from "./CountryCodeModal";
 import { Country } from "./Country";
 
-const PhoneInput = ({ color, placeholder, ...rest }) => {
+const PhoneInput = ({ color, placeholder, setCode, ...rest }) => {
   const [isCountryCodePickerOpen, setIsCountryCodePickerOpen] =
     React.useState(false);
   const [selectedCountryId, setSelectedCountryId] = React.useState(68);
+
+  React.useEffect(() => {
+    setCode(Country[selectedCountryId].code);
+  }, [selectedCountryId]);
 
   return (
     <View

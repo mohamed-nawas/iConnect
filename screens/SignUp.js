@@ -5,8 +5,17 @@ import MailInput from "../components/MailInput";
 import PasswordInput from "../components/PasswordInput";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import NameInput from "../components/NameInput";
+import { AuthContext } from "../navigation/AuthProvider";
 
-const SignUp = ({ navigation }) => {
+const SignUp = ({ navigation, route }) => {
+  const [name, setName] = React.useState("");
+  const [mail, setMail] = React.useState("");
+  const [pwd, setPwd] = React.useState("");
+  const [confirmPwd, setConfirmPwd] = React.useState("");
+
+  const { phone } = route.params ? route.params : "";
+  const { emailRegister } = React.useContext(AuthContext);
+
   return (
     <KeyboardAvoidingView
       style={{
@@ -38,16 +47,36 @@ const SignUp = ({ navigation }) => {
         Please enter your information below to login to your account
       </Text>
       <View style={{ marginBottom: 25 }}>
-        <NameInput color="#9798ac" placeholder="Enter your name" />
+        <NameInput
+          color="#9798ac"
+          placeholder="Enter your name"
+          value={name}
+          onChangeText={(value) => setName(value)}
+        />
       </View>
       <View style={{ marginBottom: 25 }}>
-        <MailInput color="#9798ac" placeholder="mgmnawas@gmail.com" />
+        <MailInput
+          color="#9798ac"
+          placeholder="mgmnawas@gmail.com"
+          value={mail}
+          onChangeText={(value) => setMail(value)}
+        />
       </View>
       <View style={{ marginBottom: 25 }}>
-        <PasswordInput color="#9798ac" placeholder="password" />
+        <PasswordInput
+          color="#9798ac"
+          placeholder="password"
+          value={pwd}
+          onChangeText={(value) => setPwd(value)}
+        />
       </View>
       <View style={{ marginBottom: 10 }}>
-        <PasswordInput color="#9798ac" placeholder="confirm password" />
+        <PasswordInput
+          color="#9798ac"
+          placeholder="confirm password"
+          value={confirmPwd}
+          onChangeText={(value) => setConfirmPwd(value)}
+        />
       </View>
       <View style={{ marginBottom: 25 }}>
         <Button
@@ -62,7 +91,11 @@ const SignUp = ({ navigation }) => {
         buttonTitle="Sign Up"
         color="#fff"
         backgroundColor="#643ade"
-        onPress={() => navigation.navigate("Profile")}
+        onPress={() => {
+          name && mail && pwd && confirmPwd && pwd === confirmPwd
+            ? emailRegister(mail, pwd, phone, name)
+            : alert("plz check");
+        }}
       />
       <View style={{ marginTop: 30 }}>
         <Button

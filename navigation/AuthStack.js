@@ -6,12 +6,36 @@ import SignUp from "../screens/SignUp";
 import HeaderBack from "react-native-vector-icons/Ionicons";
 import { TouchableOpacity } from "react-native";
 import Phone from "../screens/Phone";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Stack = createStackNavigator();
 
 const AuthStack = ({ navigation }) => {
+  const [isFirstLaunch, setIsFirstLaunch] = React.useState(null);
+  let routeName;
+
+  React.useEffect(() => {
+    // to check initial launch to show or not onboarding
+    AsyncStorage.getItem("alreadyLaunched").then((value) => {
+      if (value === null) {
+        AsyncStorage.setItem("alreadyLaunched", "true"); // No need to wait for `setItem` to finish, although you might want to handle errors
+        setIsFirstLaunch(true);
+      } else {
+        setIsFirstLaunch(false);
+      }
+    });
+  }, []);
+
+  if (isFirstLaunch === null) {
+    return null;
+  } else if (isFirstLaunch === true) {
+    routeName = "OnBoarding";
+  } else {
+    routeName = "SignIn";
+  }
+
   return (
-    <Stack.Navigator>
+    <Stack.Navigator initialRouteName={routeName}>
       <Stack.Screen
         options={{ headerShown: false }}
         name="OnBoarding"

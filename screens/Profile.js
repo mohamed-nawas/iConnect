@@ -7,9 +7,12 @@ import {
   TouchableOpacity,
   FlatList,
 } from "react-native";
-import EvilIcons from "react-native-vector-icons/EvilIcons";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import { AuthContext } from "../navigation/AuthProvider";
 
 const Profile = ({ navigation }) => {
+  const { logout } = React.useContext(AuthContext);
+
   return (
     <FlatList
       ListHeaderComponent={() => (
@@ -144,6 +147,7 @@ const Profile = ({ navigation }) => {
                 justifyContent: "center",
                 alignItems: "center",
               }}
+              onPress={() => navigation.navigate("EditProfile")}
             >
               <Text style={{ fontWeight: "bold" }}>EDIT PROFILE</Text>
             </TouchableOpacity>
@@ -157,9 +161,9 @@ const Profile = ({ navigation }) => {
                 justifyContent: "center",
                 alignItems: "center",
               }}
-              onPress={() => navigation.navigate("SignUp")}
+              onPress={() => logout()}
             >
-              <EvilIcons name="gear" color="#333333" size={25} />
+              <MaterialCommunityIcons name="logout" color="#333333" size={20} />
             </TouchableOpacity>
           </View>
           <View
