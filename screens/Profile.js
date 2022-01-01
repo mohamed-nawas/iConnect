@@ -8,10 +8,29 @@ import {
   FlatList,
 } from "react-native";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
+import PhotosCard from "../components/PhotosCard";
 import { AuthContext } from "../navigation/AuthProvider";
+import { getUserData } from "../others/Functions";
 
-const Profile = ({ navigation }) => {
+const Profile = ({ navigation, route }) => {
+  const [userData, setUserData] = React.useState();
+  const [loading, setLoading] = React.useState(true);
+  const userid = route.params.userid;
   const { logout } = React.useContext(AuthContext);
+
+  React.useEffect(() => {
+    async function fetch() {
+      const data = await getUserData(userid);
+      setUserData({
+        name: data.name,
+        caption: data.caption,
+        userimg: data.userimg,
+        photos: data.photos, // this returns an array
+      });
+    }
+    fetch();
+    navigation.addListener("focus", () => setLoading(!loading));
+  }, [navigation, loading]);
 
   return (
     <FlatList
@@ -47,7 +66,12 @@ const Profile = ({ navigation }) => {
             }}
           >
             <Image
-              source={require("../assets/images/profile.jpg")}
+              source={{
+                uri: userData
+                  ? userData.userimg ||
+                    "https://www.vhv.rs/dpng/d/188-1888496_tie-user-default-suit-display-contact-business-woman.png"
+                  : "https://www.vhv.rs/dpng/d/188-1888496_tie-user-default-suit-display-contact-business-woman.png",
+              }}
               style={{
                 width: 96,
                 height: 96,
@@ -63,13 +87,13 @@ const Profile = ({ navigation }) => {
               marginTop: -35,
             }}
           >
-            Kevin Max
+            {userData ? userData.name : null}
           </Text>
           <Text style={{ fontSize: 15, color: "#787a91" }}>@ekevin_max</Text>
           <View
             style={{ marginTop: 10, padding: 8, backgroundColor: "#f6f6f6" }}
           >
-            <Text>Lifestyle photographer, traveler, dreamer</Text>
+            <Text>{userData ? userData.caption : null}</Text>
           </View>
           <View
             style={{
@@ -166,157 +190,11 @@ const Profile = ({ navigation }) => {
               <MaterialCommunityIcons name="logout" color="#333333" size={20} />
             </TouchableOpacity>
           </View>
-          <View
-            style={{
-              width: "100%",
-              height: 250,
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: "#f6f6f6",
-            }}
-          >
-            <View
-              style={{
-                backgroundColor: "#fff",
-                width: "90%",
-                height: "90%",
-                justifyContent: "center",
-                alignItems: "flex-start",
-                paddingHorizontal: "5%",
-              }}
-            >
-              <Text
-                style={{ fontSize: 15, fontWeight: "bold", marginBottom: 20 }}
-              >
-                Photos
-              </Text>
-              <View
-                style={{
-                  width: "100%",
-                  height: 150,
-                  flexDirection: "row",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <View
-                  style={{
-                    width: "48%",
-                    height: "100%",
-                  }}
-                >
-                  <Image
-                    source={require("../assets/images/img03.jpg")}
-                    style={{ width: "100%", height: "100%", borderRadius: 10 }}
-                  />
-                </View>
-                <View
-                  style={{
-                    width: "48%",
-                    height: "100%",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <View
-                    style={{
-                      width: "100%",
-                      height: "48%",
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: "48%",
-                        height: "100%",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Image
-                        source={require("../assets/images/img02.jpg")}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          borderRadius: 5,
-                        }}
-                      />
-                    </View>
-                    <View
-                      style={{
-                        width: "48%",
-                        height: "100%",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Image
-                        source={require("../assets/images/img01.jpg")}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          borderRadius: 5,
-                        }}
-                      />
-                    </View>
-                  </View>
-                  <View
-                    style={{
-                      width: "100%",
-                      height: "48%",
-                      flexDirection: "row",
-                      justifyContent: "space-between",
-                      alignItems: "center",
-                    }}
-                  >
-                    <View
-                      style={{
-                        width: "48%",
-                        height: "100%",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Image
-                        source={require("../assets/images/img04.jpg")}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          borderRadius: 5,
-                        }}
-                      />
-                    </View>
-                    <View
-                      style={{
-                        width: "48%",
-                        height: "100%",
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <ImageBackground
-                        source={require("../assets/images/img05.jpg")}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          borderRadius: 5,
-                          opacity: 0.5,
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Text style={{ fontWeight: "bold", color: "#000" }}>
-                          +20
-                        </Text>
-                      </ImageBackground>
-                    </View>
-                  </View>
-                </View>
-              </View>
-            </View>
-          </View>
+          {userData ? (
+            userData.photos ? (
+              <PhotosCard photosarr={userData.photos} />
+            ) : null
+          ) : null}
           <View
             style={{
               width: "100%",

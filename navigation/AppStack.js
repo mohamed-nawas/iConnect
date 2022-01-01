@@ -61,7 +61,7 @@ const TabBarAdvancedButton = ({ bgColor, onPress }) => {
   );
 };
 
-const AppStack = () => {
+const AppStack = ({ userid }) => {
   return (
     <AuthProvider>
       <BottomTab.Navigator
@@ -107,42 +107,9 @@ const AppStack = () => {
         }}
       >
         <BottomTab.Screen
-          name="ProfileStack"
-          component={ProfileStack}
-          options={{
-            tabBarIcon: ({ focused }) => (
-              <View
-                style={{
-                  top: 10,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={require("../assets/profile.png")}
-                  style={{
-                    tintColor: focused ? "#288fef" : "#081122",
-                    width: 22,
-                    height: 22,
-                    resizeMode: "contain",
-                  }}
-                />
-                <Text
-                  style={{
-                    color: focused ? "#288fef" : "#081122",
-                    fontWeight: "bold",
-                    fontSize: 12,
-                  }}
-                >
-                  PROFILE
-                </Text>
-              </View>
-            ),
-          }}
-        />
-        <BottomTab.Screen
           name="HomeStack"
           component={HomeStack}
+          initialParams={{ userid: userid }}
           options={{
             tabBarIcon: ({ focused }) => (
               <View
@@ -175,18 +142,6 @@ const AppStack = () => {
           }}
         />
         <BottomTab.Screen
-          name="ConversationStack"
-          component={ConversationStack}
-          options={{
-            tabBarButton: (props) => (
-              <TabBarAdvancedButton
-                bgColor="#ffffff" // background space color.
-                {...props}
-              />
-            ),
-          }}
-        />
-        <BottomTab.Screen
           name="MessageStack"
           component={MessageStack}
           options={{
@@ -215,6 +170,53 @@ const AppStack = () => {
                   }}
                 >
                   MESSAGE
+                </Text>
+              </View>
+            ),
+          }}
+        />
+        <BottomTab.Screen
+          name="ConversationStack"
+          component={ConversationStack}
+          options={{
+            tabBarButton: (props) => (
+              <TabBarAdvancedButton
+                bgColor="#ffffff" // background space color.
+                {...props}
+              />
+            ),
+          }}
+        />
+        <BottomTab.Screen
+          name="ProfileStack"
+          component={ProfileStack}
+          initialParams={{ userid: userid }}
+          options={{
+            tabBarIcon: ({ focused }) => (
+              <View
+                style={{
+                  top: 10,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Image
+                  source={require("../assets/profile.png")}
+                  style={{
+                    tintColor: focused ? "#288fef" : "#081122",
+                    width: 22,
+                    height: 22,
+                    resizeMode: "contain",
+                  }}
+                />
+                <Text
+                  style={{
+                    color: focused ? "#288fef" : "#081122",
+                    fontWeight: "bold",
+                    fontSize: 12,
+                  }}
+                >
+                  PROFILE
                 </Text>
               </View>
             ),

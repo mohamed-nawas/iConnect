@@ -36,7 +36,11 @@
 		</dict>
 	</dict>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>Location access is required to run the app</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>iConnect requires photo library access</string>
+	<key>NSCameraUsageDescription</key>
+	<string>iConnect requires camera access</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>

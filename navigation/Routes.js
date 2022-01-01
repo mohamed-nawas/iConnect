@@ -21,8 +21,8 @@ const Routes = () => {
   };
 
   React.useEffect(() => {
-    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
     RNBootSplash.hide();
+    const subscriber = auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber; // unsubscribe on unmount
   }, []);
 
@@ -30,7 +30,7 @@ const Routes = () => {
 
   return (
     <NavigationContainer>
-      {user ? <AppStack /> : <AuthStack />}
+      {user ? <AppStack userid={user.uid} /> : <AuthStack />}
     </NavigationContainer>
   );
 };
