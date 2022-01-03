@@ -1,13 +1,8 @@
 import React from "react";
-import { AuthProvider } from "./navigation/AuthProvider";
-import Routes from "./navigation/Routes";
+import Providers from "./navigation";
 
 const App = () => {
-  return (
-    <AuthProvider>
-      <Routes />
-    </AuthProvider>
-  );
+  return <Providers />;
 };
 
 export default App;

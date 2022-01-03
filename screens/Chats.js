@@ -1,12 +1,12 @@
 import React from "react";
 import { View, Text } from "react-native";
 
-const Conversation = () => {
+const Chats = () => {
   return (
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-      <Text>Conversation.js</Text>
+      <Text>Chats.js</Text>
     </View>
   );
 };
 
-export default Conversation;
+export default Chats;

@@ -6,6 +6,7 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import Feather from "react-native-vector-icons/Feather";
 import Svg, { Path } from "react-native-svg";
 import { getUserData } from "../others/Functions";
+import { AuthContext } from "../navigation/AuthProvider";
 
 const CardBg = ({ color = "#000", ...props }) => {
   return (
@@ -18,10 +19,11 @@ const CardBg = ({ color = "#000", ...props }) => {
   );
 };
 
-const PostCard = ({ item }) => {
+const PostCard = ({ item, onPress }) => {
   const [profileimg, setProfileimg] = React.useState(null);
   const [name, setName] = React.useState(null);
   const [location, setLocation] = React.useState(null);
+  const { user } = React.useContext(AuthContext);
 
   let post = item.post;
   if (item.isprofile) {
@@ -71,7 +73,12 @@ const PostCard = ({ item }) => {
         >
           <TouchableOpacity>
             <Image
-              source={{ uri: profileimg }}
+              source={{
+                uri: profileimg
+                  ? profileimg ||
+                    "https://www.vhv.rs/dpng/d/188-1888496_tie-user-default-suit-display-contact-business-woman.png"
+                  : "https://www.vhv.rs/dpng/d/188-1888496_tie-user-default-suit-display-contact-business-woman.png",
+              }}
               style={{ width: 50, height: 50, borderRadius: 25 }}
             />
           </TouchableOpacity>
@@ -90,18 +97,33 @@ const PostCard = ({ item }) => {
                 flexDirection: "row",
               }}
             >
-              <TouchableOpacity>
-                <Text
-                  style={{
-                    color: "#231454",
-                    fontWeight: "bold",
-                    fontSize: 15,
-                    marginBottom: 3,
-                  }}
-                >
-                  {name}
-                </Text>
-              </TouchableOpacity>
+              {item.userid !== user.uid ? (
+                <TouchableOpacity onPress={onPress}>
+                  <Text
+                    style={{
+                      color: "#231454",
+                      fontWeight: "bold",
+                      fontSize: 15,
+                      marginBottom: 3,
+                    }}
+                  >
+                    {name}
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <View>
+                  <Text
+                    style={{
+                      color: "#231454",
+                      fontWeight: "bold",
+                      fontSize: 15,
+                      marginBottom: 3,
+                    }}
+                  >
+                    {name}
+                  </Text>
+                </View>
+              )}
               {item.isprofile ? (
                 <Text
                   style={{

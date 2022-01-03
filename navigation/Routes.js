@@ -7,12 +7,9 @@ import auth from "@react-native-firebase/auth";
 import { AuthContext } from "./AuthProvider";
 
 const Routes = () => {
-  const [isFirstLaunch, setIsFirstLaunch] = React.useState();
-  let routeName;
-
   // Set an initializing state whilst Firebase connects
-  const [initializing, setInitializing] = React.useState(true);
   const { user, setUser } = React.useContext(AuthContext);
+  const [initializing, setInitializing] = React.useState(true);
 
   // Handle user state changes
   const onAuthStateChanged = (user) => {
@@ -30,7 +27,7 @@ const Routes = () => {
 
   return (
     <NavigationContainer>
-      {user ? <AppStack userid={user.uid} /> : <AuthStack />}
+      {user ? <AppStack /> : <AuthStack />}
     </NavigationContainer>
   );
 };

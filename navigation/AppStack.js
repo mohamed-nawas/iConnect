@@ -1,34 +1,35 @@
 import React from "react";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
   Dimensions,
-  Image,
   Platform,
   StyleSheet,
   Text,
-  View,
   TouchableOpacity,
+  View,
+  Image,
 } from "react-native";
+import { createStackNavigator } from "@react-navigation/stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Profile from "../screens/Profile";
+import EditProfile from "../screens/EditProfile";
+import Home from "../screens/Home";
+import Home_Profile from "../screens/Home_Profile";
+import Notification from "../screens/Notification";
+import Setting from "../screens/Setting";
 import Svg, { Path } from "react-native-svg";
 import Entypo from "react-native-vector-icons/Entypo";
-import { AuthProvider } from "./AuthProvider";
-import {
-  ConversationStack,
-  HomeStack,
-  MessageStack,
-  ProfileStack,
-  SettingsStack,
-} from "./Stacks";
+import Chats from "../screens/Chats";
 
-const BottomTab = createBottomTabNavigator();
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
 const TabBg = ({ color = "#FFFFFF", ...props }) => {
   return (
     <Svg width={349} height={83} viewBox="0 0 75 66" {...props}>
       {/* <Path
-        d="M75.2 0v61H0V0c4.1 0 7.4 3.1 7.9 7.1C10 21.7 22.5 33 37.7 33c15.2 0 27.7-11.3 29.7-25.9.5-4 3.9-7.1 7.9-7.1h-.1z"
-        fill={color}
-      /> */}
+          d="M75.2 0v61H0V0c4.1 0 7.4 3.1 7.9 7.1C10 21.7 22.5 33 37.7 33c15.2 0 27.7-11.3 29.7-25.9.5-4 3.9-7.1 7.9-7.1h-.1z"
+          fill={color}
+        /> */}
       <Path
         d="M 75.2 0 H 225.6 v 90 H -150.4 V 0 H 0 c 4.1 0 7.4 3.1 7.9 7.1 C 10 21.7 22.5 33 37.7 33 c 15.2 0 27.7 -11.3 29.7 -25.9 c 0.5 -4 3.9 -7.1 7.9 -7.1 h -0.1 z"
         fill={color}
@@ -61,203 +62,262 @@ const TabBarAdvancedButton = ({ bgColor, onPress }) => {
   );
 };
 
-const AppStack = ({ userid }) => {
+const ProfileStack = ({ navigation }) => (
+  <Stack.Navigator>
+    <Stack.Screen
+      name="Profile"
+      component={Profile}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="EditProfile"
+      component={EditProfile}
+      options={{
+        title: "Profile",
+        headerBackTitle: "Back",
+      }}
+    />
+  </Stack.Navigator>
+);
+
+const HomeStack = ({ navigation }) => (
+  <Stack.Navigator>
+    <Stack.Screen
+      name="Home"
+      component={Home}
+      options={{ headerShown: false }}
+    />
+    <Stack.Screen
+      name="Home_Profile"
+      component={Home_Profile}
+      options={{ headerShown: false }}
+    />
+  </Stack.Navigator>
+);
+
+const ConversationStack = ({ navigation }) => (
+  <Stack.Navigator>
+    <Stack.Screen
+      name="Chats"
+      component={Chats}
+      options={{ headerShown: false }}
+    />
+  </Stack.Navigator>
+);
+
+const MessageStack = ({ navigation }) => (
+  <Stack.Navigator>
+    <Stack.Screen
+      name="Notification"
+      component={Notification}
+      options={{ headerShown: false }}
+    />
+  </Stack.Navigator>
+);
+
+const SettingsStack = ({ navigation }) => (
+  <Stack.Navigator>
+    <Stack.Screen
+      name="Setting"
+      component={Setting}
+      options={{ headerShown: false }}
+    />
+  </Stack.Navigator>
+);
+
+const AppStack = () => {
   return (
-    <AuthProvider>
-      <BottomTab.Navigator
-        screenOptions={{
-          tabBarBackground: () => (
+    <Tab.Navigator
+      screenOptions={{
+        tabBarBackground: () => (
+          <View
+            style={{
+              position: "relative",
+              alignItems: "center",
+            }}
+            pointerEvents="box-none"
+          >
+            <TabBg
+              color="#fff"
+              style={{ position: "absolute", top: 0, left: 0 }}
+            />
+          </View>
+        ),
+        headerShown: false,
+        tabBarShowLabel: false,
+        tabBarStyle: {
+          position: "absolute",
+          bottom:
+            Platform.OS === "ios"
+              ? (Dimensions.get("window").width / 380) * 25
+              : (Dimensions.get("window").width / 380) * 15,
+          left:
+            Platform.OS === "ios"
+              ? (Dimensions.get("window").width / 380) * 20
+              : (Dimensions.get("window").width / 380) * 15,
+          right:
+            Platform.OS === "ios"
+              ? (Dimensions.get("window").width / 380) * 20
+              : (Dimensions.get("window").width / 380) * 15,
+          backgroundColor: "transparent",
+          borderRadius: (Dimensions.get("window").width / 380) * 15,
+          height:
+            Platform.OS === "ios"
+              ? (Dimensions.get("window").width / 380) * 83
+              : (Dimensions.get("window").width / 380) * 80,
+          ...style.shadow,
+        },
+      }}
+    >
+      <Tab.Screen
+        name="HomeStack"
+        component={HomeStack}
+        options={{
+          tabBarIcon: ({ focused }) => (
             <View
               style={{
-                position: "relative",
+                top: 10,
+                justifyContent: "center",
                 alignItems: "center",
               }}
-              pointerEvents="box-none"
             >
-              <TabBg
-                color="#fff"
-                style={{ position: "absolute", top: 0, left: 0 }}
+              <Image
+                source={require("../assets/home.png")}
+                style={{
+                  tintColor: focused ? "#288fef" : "#081122",
+                  width: 22,
+                  height: 22,
+                  resizeMode: "contain",
+                }}
               />
+              <Text
+                style={{
+                  color: focused ? "#288fef" : "#081122",
+                  fontWeight: "bold",
+                  fontSize: 12,
+                }}
+              >
+                HOME
+              </Text>
             </View>
           ),
-          headerShown: false,
-          tabBarShowLabel: false,
-          tabBarStyle: {
-            position: "absolute",
-            bottom:
-              Platform.OS === "ios"
-                ? (Dimensions.get("window").width / 380) * 25
-                : (Dimensions.get("window").width / 380) * 15,
-            left:
-              Platform.OS === "ios"
-                ? (Dimensions.get("window").width / 380) * 20
-                : (Dimensions.get("window").width / 380) * 15,
-            right:
-              Platform.OS === "ios"
-                ? (Dimensions.get("window").width / 380) * 20
-                : (Dimensions.get("window").width / 380) * 15,
-            backgroundColor: "transparent",
-            borderRadius: (Dimensions.get("window").width / 380) * 15,
-            height:
-              Platform.OS === "ios"
-                ? (Dimensions.get("window").width / 380) * 83
-                : (Dimensions.get("window").width / 380) * 80,
-            ...style.shadow,
-          },
         }}
-      >
-        <BottomTab.Screen
-          name="HomeStack"
-          component={HomeStack}
-          initialParams={{ userid: userid }}
-          options={{
-            tabBarIcon: ({ focused }) => (
-              <View
+      />
+      <Tab.Screen
+        name="ProfileStack"
+        component={ProfileStack}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <View
+              style={{
+                top: 10,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={require("../assets/profile.png")}
                 style={{
-                  top: 10,
-                  justifyContent: "center",
-                  alignItems: "center",
+                  tintColor: focused ? "#288fef" : "#081122",
+                  width: 22,
+                  height: 22,
+                  resizeMode: "contain",
                 }}
-              >
-                <Image
-                  source={require("../assets/home.png")}
-                  style={{
-                    tintColor: focused ? "#288fef" : "#081122",
-                    width: 22,
-                    height: 22,
-                    resizeMode: "contain",
-                  }}
-                />
-                <Text
-                  style={{
-                    color: focused ? "#288fef" : "#081122",
-                    fontWeight: "bold",
-                    fontSize: 12,
-                  }}
-                >
-                  HOME
-                </Text>
-              </View>
-            ),
-          }}
-        />
-        <BottomTab.Screen
-          name="MessageStack"
-          component={MessageStack}
-          options={{
-            tabBarIcon: ({ focused }) => (
-              <View
-                style={{
-                  top: 10,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Image
-                  source={require("../assets/bell.png")}
-                  style={{
-                    tintColor: focused ? "#288fef" : "#081122",
-                    width: 22,
-                    height: 22,
-                    resizeMode: "contain",
-                  }}
-                />
-                <Text
-                  style={{
-                    color: focused ? "#288fef" : "#081122",
-                    fontWeight: "bold",
-                    fontSize: 12,
-                  }}
-                >
-                  MESSAGE
-                </Text>
-              </View>
-            ),
-          }}
-        />
-        <BottomTab.Screen
-          name="ConversationStack"
-          component={ConversationStack}
-          options={{
-            tabBarButton: (props) => (
-              <TabBarAdvancedButton
-                bgColor="#ffffff" // background space color.
-                {...props}
               />
-            ),
-          }}
-        />
-        <BottomTab.Screen
-          name="ProfileStack"
-          component={ProfileStack}
-          initialParams={{ userid: userid }}
-          options={{
-            tabBarIcon: ({ focused }) => (
-              <View
+              <Text
                 style={{
-                  top: 10,
-                  justifyContent: "center",
-                  alignItems: "center",
+                  color: focused ? "#288fef" : "#081122",
+                  fontWeight: "bold",
+                  fontSize: 12,
                 }}
               >
-                <Image
-                  source={require("../assets/profile.png")}
-                  style={{
-                    tintColor: focused ? "#288fef" : "#081122",
-                    width: 22,
-                    height: 22,
-                    resizeMode: "contain",
-                  }}
-                />
-                <Text
-                  style={{
-                    color: focused ? "#288fef" : "#081122",
-                    fontWeight: "bold",
-                    fontSize: 12,
-                  }}
-                >
-                  PROFILE
-                </Text>
-              </View>
-            ),
-          }}
-        />
-        <BottomTab.Screen
-          name="SettingsStack"
-          component={SettingsStack}
-          options={{
-            tabBarIcon: ({ focused }) => (
-              <View
+                PROFILE
+              </Text>
+            </View>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="ConversationStack"
+        component={ConversationStack}
+        options={{
+          tabBarButton: (props) => (
+            <TabBarAdvancedButton
+              bgColor="#ffffff" // background space color.
+              {...props}
+            />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="MessageStack"
+        component={MessageStack}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <View
+              style={{
+                top: 10,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={require("../assets/bell.png")}
                 style={{
-                  top: 10,
-                  justifyContent: "center",
-                  alignItems: "center",
+                  tintColor: focused ? "#288fef" : "#081122",
+                  width: 22,
+                  height: 22,
+                  resizeMode: "contain",
+                }}
+              />
+              <Text
+                style={{
+                  color: focused ? "#288fef" : "#081122",
+                  fontWeight: "bold",
+                  fontSize: 12,
                 }}
               >
-                <Image
-                  source={require("../assets/settings.png")}
-                  style={{
-                    tintColor: focused ? "#288fef" : "#081122",
-                    width: 22,
-                    height: 22,
-                    resizeMode: "contain",
-                  }}
-                />
-                <Text
-                  style={{
-                    color: focused ? "#288fef" : "#081122",
-                    fontWeight: "bold",
-                    fontSize: 12,
-                  }}
-                >
-                  SETTINGS
-                </Text>
-              </View>
-            ),
-          }}
-        />
-      </BottomTab.Navigator>
-    </AuthProvider>
+                NEWS
+              </Text>
+            </View>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="SettingsStack"
+        component={SettingsStack}
+        options={{
+          tabBarIcon: ({ focused }) => (
+            <View
+              style={{
+                top: 10,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Image
+                source={require("../assets/settings.png")}
+                style={{
+                  tintColor: focused ? "#288fef" : "#081122",
+                  width: 22,
+                  height: 22,
+                  resizeMode: "contain",
+                }}
+              />
+              <Text
+                style={{
+                  color: focused ? "#288fef" : "#081122",
+                  fontWeight: "bold",
+                  fontSize: 12,
+                }}
+              >
+                SETTINGS
+              </Text>
+            </View>
+          ),
+        }}
+      />
+    </Tab.Navigator>
   );
 };
 

@@ -3,12 +3,11 @@ import { View, Text, FlatList, TouchableOpacity } from "react-native";
 import AntDesign from "react-native-vector-icons/AntDesign";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import PostCard from "../components/PostCard";
-import { getPosts, getUserData } from "../others/Functions";
+import { getPosts } from "../others/Functions";
 import FeaturedStories from "../components/FeaturedStories";
 import Status from "../components/Status";
 
-const Home = ({ navigation, route }) => {
-  const userid = route.params.userid;
+const Home = ({ navigation }) => {
   const [isPendingNot, setIsPendingNot] = React.useState(false);
   const [isPendingMsg, setIsPendingMsg] = React.useState(true);
   const [loading, setLoading] = React.useState(true);
@@ -105,12 +104,17 @@ const Home = ({ navigation, route }) => {
         ListHeaderComponent={() => (
           <>
             <FeaturedStories />
-            <Status userid={userid} />
+            <Status />
           </>
         )}
         renderItem={({ item }) => (
           <View style={{ backgroundColor: "#f6f6f6" }}>
-            <PostCard item={item} />
+            <PostCard
+              item={item}
+              onPress={() =>
+                navigation.navigate("Home_Profile", { userid: item.userid })
+              }
+            />
           </View>
         )}
       />

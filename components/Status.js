@@ -7,20 +7,27 @@ import Entypo from "react-native-vector-icons/Entypo";
 import { getUserData, createPost } from "../others/Functions";
 import ImagePicker from "react-native-image-crop-picker";
 import storage from "@react-native-firebase/storage";
+import { AuthContext } from "../navigation/AuthProvider";
 
-const Status = ({ userid }) => {
+const Status = () => {
   const [userData, setUserData] = React.useState();
   const [image, setImage] = React.useState(null);
   const [post, setPost] = React.useState("");
   const [uploading, setUploading] = React.useState(false);
   const [transferred, setTransferred] = React.useState(0);
+  const { user } = React.useContext(AuthContext);
+  const mounted = React.useRef(true);
 
   React.useEffect(() => {
+    mounted.current = true;
     async function fetchUser() {
-      const data = await getUserData(userid);
-      setUserData(data);
+      const data = await getUserData(user.uid);
+      if (mounted.current) {
+        setUserData(data);
+      }
     }
     fetchUser();
+    return () => (mounted.current = false);
   }, []);
 
   const handleImagePick = () => {
@@ -74,19 +81,19 @@ const Status = ({ userid }) => {
     let imgUrl = await uploadImage();
 
     if (imgUrl && !post) {
-      createPost(userid, imgUrl, "");
+      createPost(user.uid, imgUrl, "");
       setPost("");
       setImage(null);
       alert("Post added successfully");
     }
     if (post && !imgUrl) {
-      createPost(userid, null, post);
+      createPost(user.uid, null, post);
       setPost("");
       setImage(null);
       alert("Post added successfully");
     }
     if (post && imgUrl) {
-      createPost(userid, imgUrl, post);
+      createPost(user.uid, imgUrl, post);
       setPost("");
       setImage(null);
       alert("Post added successfully");

@@ -22,13 +22,11 @@ import Animated from "react-native-reanimated";
 import ImagePicker from "react-native-image-crop-picker";
 import storage from "@react-native-firebase/storage";
 
-const EditProfile = ({ navigation, route }) => {
+const EditProfile = ({ navigation }) => {
   const [image, setImage] = React.useState(null);
   const [uploading, setUploading] = React.useState(false);
   const [transferred, setTransferred] = React.useState(0);
-  const userid = route.params.userid;
   const { user } = React.useContext(AuthContext);
-  // const [userData, setUserData] = React.useState(null);
   const [isBSOpen, setIsBSOpen] = React.useState(false);
 
   const bs = React.createRef();
@@ -53,9 +51,7 @@ const EditProfile = ({ navigation, route }) => {
 
   React.useEffect(() => {
     async function fetchData() {
-      // const response = await getUserData(userid);
-      // setUserData(response);
-      const data = await getUserData(userid);
+      const data = await getUserData(user.uid);
       setUserData({
         name: data.name ? data.name : "",
         dob: data.dob ? data.dob.toDate() : "",
@@ -281,7 +277,7 @@ const EditProfile = ({ navigation, route }) => {
       const url = await storageRef.getDownloadURL();
       setUploading(false);
 
-      createProfilePost(userid, url);
+      createProfilePost(user.uid, url);
 
       return url;
     } catch (e) {
@@ -297,7 +293,7 @@ const EditProfile = ({ navigation, route }) => {
       imgUrl = userData.userimg;
     }
 
-    updateUser(userid, userData, imgUrl);
+    updateUser(user.uid, userData, imgUrl);
     alert("update successfull");
   };
 

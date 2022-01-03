@@ -2,24 +2,31 @@ import React from "react";
 import {
   View,
   Text,
+  FlatList,
   Image,
   ImageBackground,
   TouchableOpacity,
-  FlatList,
 } from "react-native";
+import { AuthContext } from "../navigation/AuthProvider";
+import {
+  checkIsFollowing,
+  follow,
+  getUserData,
+  unfollow,
+} from "../others/Functions";
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import PhotosCard from "../components/PhotosCard";
-import { AuthContext } from "../navigation/AuthProvider";
-import { getUserData } from "../others/Functions";
 
-const Profile = ({ navigation }) => {
+const Home_Profile = ({ navigation, route }) => {
   const [userData, setUserData] = React.useState();
   const [loading, setLoading] = React.useState(true);
-  const { user, logout } = React.useContext(AuthContext);
+  const userid = route.params.userid;
+  const { user } = React.useContext(AuthContext);
+  const [isFollowing, setIsFollowing] = React.useState(false);
 
   React.useEffect(() => {
     async function fetch() {
-      const data = await getUserData(user.uid);
+      const data = await getUserData(userid);
       setUserData({
         name: data.name,
         caption: data.caption,
@@ -28,6 +35,13 @@ const Profile = ({ navigation }) => {
       });
     }
     fetch();
+
+    async function isFollowing() {
+      const isFollowing = await checkIsFollowing(user.uid, userid);
+      setIsFollowing(isFollowing);
+    }
+    isFollowing();
+
     navigation.addListener("focus", () => setLoading(!loading));
   }, [navigation, loading]);
 
@@ -160,9 +174,49 @@ const Profile = ({ navigation }) => {
               marginBottom: 10,
             }}
           >
+            {isFollowing ? (
+              <TouchableOpacity
+                onPress={() => {
+                  unfollow(user.uid, userid);
+                  setIsFollowing(!isFollowing);
+                }}
+                style={{
+                  width: "45%",
+                  height: "100%",
+                  backgroundColor: "#3a24c0",
+                  borderWidth: 2,
+                  borderColor: "#dbdde0",
+                  borderRadius: 5,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ fontWeight: "bold", color: "#fff" }}>
+                  FOLLOWING
+                </Text>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={() => {
+                  follow(user.uid, userid);
+                  setIsFollowing(!isFollowing);
+                }}
+                style={{
+                  width: "45%",
+                  height: "100%",
+                  borderWidth: 2,
+                  borderColor: "#dbdde0",
+                  borderRadius: 5,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Text style={{ fontWeight: "bold" }}>FOLLOW</Text>
+              </TouchableOpacity>
+            )}
             <TouchableOpacity
               style={{
-                width: "85%",
+                width: "45%",
                 height: "100%",
                 borderWidth: 2,
                 borderColor: "#dbdde0",
@@ -170,23 +224,8 @@ const Profile = ({ navigation }) => {
                 justifyContent: "center",
                 alignItems: "center",
               }}
-              onPress={() => navigation.navigate("EditProfile")}
             >
-              <Text style={{ fontWeight: "bold" }}>EDIT PROFILE</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={{
-                width: "10%",
-                height: "100%",
-                borderWidth: 2,
-                borderColor: "#dbdde0",
-                borderRadius: 5,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-              onPress={() => logout()}
-            >
-              <MaterialCommunityIcons name="logout" color="#333333" size={20} />
+              <Text style={{ fontWeight: "bold" }}>CHAT</Text>
             </TouchableOpacity>
           </View>
           {userData ? (
@@ -352,4 +391,4 @@ const Profile = ({ navigation }) => {
   );
 };
 
-export default Profile;
+export default Home_Profile;

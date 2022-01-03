@@ -94,6 +94,118 @@ export const createPost = (userid, postimg, post) => {
   }
 };
 
+export const follow = (follower_userid, following_userid) => {
+  firestore()
+    .collection("Users")
+    .where("userid", "==", follower_userid)
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.docs.find(async (doc) => {
+        const id = doc.id;
+        await firestore()
+          .collection("Users")
+          .doc(id)
+          .set(
+            {
+              following_userid:
+                firestore.FieldValue.arrayUnion(following_userid),
+            },
+            { merge: true }
+          )
+          .then(() => console.log("following added to current user"))
+          .catch((e) => console.log(e));
+      });
+    })
+    .catch((e) => console.log(e));
+
+  firestore()
+    .collection("Users")
+    .where("userid", "==", following_userid)
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.docs.find(async (doc) => {
+        const id = doc.id;
+        await firestore()
+          .collection("Users")
+          .doc(id)
+          .set(
+            {
+              follower_userid: firestore.FieldValue.arrayUnion(follower_userid),
+            },
+            { merge: true }
+          )
+          .then(() => console.log("follower added to other user"))
+          .catch((e) => console.log(e));
+      });
+    })
+    .catch((e) => console.log(e));
+};
+
+export const unfollow = (follower_userid, following_userid) => {
+  firestore()
+    .collection("Users")
+    .where("userid", "==", follower_userid)
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.docs.find(async (doc) => {
+        const id = doc.id;
+        await firestore()
+          .collection("Users")
+          .doc(id)
+          .set(
+            {
+              following_userid:
+                firestore.FieldValue.arrayRemove(following_userid),
+            },
+            { merge: true }
+          )
+          .then(() => console.log("following removed from current user"))
+          .catch((e) => console.log(e));
+      });
+    })
+    .catch((e) => console.log(e));
+
+  firestore()
+    .collection("Users")
+    .where("userid", "==", following_userid)
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.docs.find(async (doc) => {
+        const id = doc.id;
+        await firestore()
+          .collection("Users")
+          .doc(id)
+          .set(
+            {
+              follower_userid:
+                firestore.FieldValue.arrayRemove(follower_userid),
+            },
+            { merge: true }
+          )
+          .then(() => console.log("follower removed from other user"))
+          .catch((e) => console.log(e));
+      });
+    })
+    .catch((e) => console.log(e));
+};
+
+export const checkIsFollowing = async (current_userid, other_userid) => {
+  let isFollowing;
+
+  const querySnapshot = await firestore()
+    .collection("Users")
+    .where("userid", "==", current_userid)
+    .get();
+  querySnapshot.docs.find((doc) => {
+    const { following_userid } = doc.data();
+    if (following_userid) {
+      isFollowing = following_userid.includes(other_userid);
+    }
+  });
+
+  return isFollowing;
+};
+
 export const getUserData = async (userid) => {
   let response;
 
