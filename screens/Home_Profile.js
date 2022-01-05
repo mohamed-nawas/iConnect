@@ -23,26 +23,33 @@ const Home_Profile = ({ navigation, route }) => {
   const userid = route.params.userid;
   const { user } = React.useContext(AuthContext);
   const [isFollowing, setIsFollowing] = React.useState(false);
+  const mounted = React.useRef(true);
 
   React.useEffect(() => {
+    mounted.current = true;
     async function fetch() {
       const data = await getUserData(userid);
-      setUserData({
-        name: data.name,
-        caption: data.caption,
-        userimg: data.userimg,
-        photos: data.photos, // this returns an array
-      });
+      if (mounted.current) {
+        setUserData({
+          name: data.name,
+          caption: data.caption,
+          userimg: data.userimg,
+          photos: data.photos, // this returns an array
+        });
+      }
     }
     fetch();
 
     async function isFollowing() {
       const isFollowing = await checkIsFollowing(user.uid, userid);
-      setIsFollowing(isFollowing);
+      if (mounted.current) {
+        setIsFollowing(isFollowing);
+      }
     }
     isFollowing();
 
     navigation.addListener("focus", () => setLoading(!loading));
+    return () => (mounted.current = false);
   }, [navigation, loading]);
 
   return (
@@ -215,6 +222,11 @@ const Home_Profile = ({ navigation, route }) => {
               </TouchableOpacity>
             )}
             <TouchableOpacity
+              onPress={() =>
+                navigation.navigate("Home_ChatRoom", {
+                  userid: userid,
+                })
+              }
               style={{
                 width: "45%",
                 height: "100%",

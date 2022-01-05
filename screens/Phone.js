@@ -7,9 +7,14 @@ const Phone = ({ navigation }) => {
   const [code, setCode] = React.useState("");
   const [phone, setPhone] = React.useState("");
   const [num, setNum] = React.useState("");
+  const mounted = React.useRef(true);
 
   React.useEffect(() => {
-    setNum(code.concat(phone));
+    mounted.current = true;
+    if (mounted.current) {
+      setNum(code.concat(phone));
+    }
+    return () => (mounted.current = false);
   }, [code, phone]);
 
   return (

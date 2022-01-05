@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   View,
   Image,
+  Button,
 } from "react-native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -19,6 +20,7 @@ import Setting from "../screens/Setting";
 import Svg, { Path } from "react-native-svg";
 import Entypo from "react-native-vector-icons/Entypo";
 import Chats from "../screens/Chats";
+import ChatRoom from "../screens/ChatRoom";
 
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -80,30 +82,69 @@ const ProfileStack = ({ navigation }) => (
   </Stack.Navigator>
 );
 
-const HomeStack = ({ navigation }) => (
-  <Stack.Navigator>
-    <Stack.Screen
-      name="Home"
-      component={Home}
-      options={{ headerShown: false }}
-    />
-    <Stack.Screen
-      name="Home_Profile"
-      component={Home_Profile}
-      options={{ headerShown: false }}
-    />
-  </Stack.Navigator>
-);
+const HomeStack = ({ navigation, route }) => {
+  const routeName = route.params ? route.params.routeName : "Home";
 
-const ConversationStack = ({ navigation }) => (
-  <Stack.Navigator>
-    <Stack.Screen
-      name="Chats"
-      component={Chats}
-      options={{ headerShown: false }}
-    />
-  </Stack.Navigator>
-);
+  return (
+    <Stack.Navigator initialRouteName={routeName}>
+      <Stack.Screen
+        name="Home"
+        component={Home}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Home_Profile"
+        component={Home_Profile}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="Home_ChatRoom"
+        component={ChatRoom}
+        initialParams={{ userid: route.params ? route.params.userid : null }}
+        options={{
+          title: route.params ? route.params.name : null,
+          headerLeft: () => (
+            <Button
+              title="Chats"
+              onPress={() =>
+                navigation.navigate("ConversationStack", { routeName: "Chats" })
+              }
+            />
+          ),
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
+
+const ConversationStack = ({ navigation, route }) => {
+  const routeName = route.params ? route.params.routeName : "Chats";
+
+  return (
+    <Stack.Navigator initialRouteName={routeName}>
+      <Stack.Screen
+        name="Chats"
+        component={Chats}
+        options={{
+          title: "Chats",
+        }}
+      />
+      <Stack.Screen
+        name="ChatRoom"
+        component={ChatRoom}
+        initialParams={{ userid: route.params ? route.params.userid : null }}
+        options={{
+          headerLeft: () => (
+            <Button
+              title="Chats"
+              onPress={() => navigation.navigate("Chats")}
+            />
+          ),
+        }}
+      />
+    </Stack.Navigator>
+  );
+};
 
 const MessageStack = ({ navigation }) => (
   <Stack.Navigator>

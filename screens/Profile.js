@@ -10,29 +10,122 @@ import {
 import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 import PhotosCard from "../components/PhotosCard";
 import { AuthContext } from "../navigation/AuthProvider";
-import { getUserData } from "../others/Functions";
+import {
+  getMoreUserPosts,
+  getUserData,
+  getUserPosts,
+} from "../others/Functions";
+import Spinner from "react-native-loading-spinner-overlay";
+import PostCard from "../components/PostCard";
 
 const Profile = ({ navigation }) => {
   const [userData, setUserData] = React.useState();
   const [loading, setLoading] = React.useState(true);
   const { user, logout } = React.useContext(AuthContext);
+  const mounted = React.useRef(true);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [startAfter, setStartAfter] = React.useState(Object);
+  const [spinner, setSpinner] = React.useState(false);
+  const [posts, setPosts] = React.useState(new Array());
+  const [lastPost, setLastPost] = React.useState(false);
 
   React.useEffect(() => {
+    mounted.current = true;
+    if (mounted.current) {
+      setLastPost(false);
+    }
     async function fetch() {
       const data = await getUserData(user.uid);
-      setUserData({
-        name: data.name,
-        caption: data.caption,
-        userimg: data.userimg,
-        photos: data.photos, // this returns an array
-      });
+      if (mounted.current) {
+        setUserData({
+          name: data.name,
+          caption: data.caption,
+          userimg: data.userimg,
+          photos: data.photos, // this returns an array
+        });
+      }
     }
     fetch();
+    const getUserPosts1 = async () => {
+      await fetchUserPosts();
+    };
+    getUserPosts1();
     navigation.addListener("focus", () => setLoading(!loading));
+    return () => (mounted.current = false);
   }, [navigation, loading]);
+
+  const fetchUserPosts = async () => {
+    setSpinner(true);
+    const data = await getUserPosts(user.uid, 4);
+    setPosts(data.posts);
+    setStartAfter(data.lastVisible);
+    setSpinner(false);
+  };
+
+  const fetchMoreUserPosts = async () => {
+    if (!lastPost) {
+      setSpinner(true);
+      const data = await getMoreUserPosts(user.uid, startAfter, 4);
+      setPosts([...posts, ...data.posts]);
+      setStartAfter(data.lastVisible);
+      data.posts.length == 0 ? setLastPost(true) : setLastPost(false);
+      setSpinner(false);
+    }
+  };
+
+  const renderFooter = () => {
+    return !lastPost ? (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "#F5FCFF",
+        }}
+      >
+        <Spinner
+          visible={spinner}
+          textContent={"Loading..."}
+          textStyle={{ color: "#FFF" }}
+        />
+      </View>
+    ) : (
+      <View
+        style={{
+          width: "100%",
+          height: 50,
+          backgroundColor: "#fff",
+          justifyContent: "center",
+          alignItems: "center",
+          borderTopWidth: 1,
+          borderTopColor: "#000",
+        }}
+      >
+        <Text
+          style={{
+            fontSize: 15,
+            fontWeight: "bold",
+          }}
+        >
+          No More posts to show
+        </Text>
+      </View>
+    );
+  };
+
+  const handleRefresh = () => {
+    fetchUserPosts();
+    setRefreshing(false);
+  };
 
   return (
     <FlatList
+      data={posts}
+      renderItem={({ item }) => (
+        <View style={{ backgroundColor: "#f6f6f6" }}>
+          <PostCard item={item} />
+        </View>
+      )}
       ListHeaderComponent={() => (
         <View
           style={{
@@ -348,6 +441,12 @@ const Profile = ({ navigation }) => {
         </View>
       )}
       showsVerticalScrollIndicator={false}
+      refreshing={refreshing}
+      onRefresh={handleRefresh}
+      onEndReached={fetchMoreUserPosts}
+      onEndReachedThreshold={0.01}
+      scrollEventThrottle={150}
+      ListFooterComponent={renderFooter}
     />
   );
 };

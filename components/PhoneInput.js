@@ -7,9 +7,14 @@ const PhoneInput = ({ color, placeholder, setCode, ...rest }) => {
   const [isCountryCodePickerOpen, setIsCountryCodePickerOpen] =
     React.useState(false);
   const [selectedCountryId, setSelectedCountryId] = React.useState(68);
+  const mounted = React.useRef(true);
 
   React.useEffect(() => {
-    setCode(Country[selectedCountryId].code);
+    mounted.current = true;
+    if (mounted.current) {
+      setCode(Country[selectedCountryId].code);
+    }
+    return () => (mounted.current = false);
   }, [selectedCountryId]);
 
   return (

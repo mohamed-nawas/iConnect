@@ -28,6 +28,7 @@ const EditProfile = ({ navigation }) => {
   const [transferred, setTransferred] = React.useState(0);
   const { user } = React.useContext(AuthContext);
   const [isBSOpen, setIsBSOpen] = React.useState(false);
+  const mounted = React.useRef(true);
 
   const bs = React.createRef();
   const fall = new Animated.Value(1);
@@ -41,27 +42,23 @@ const EditProfile = ({ navigation }) => {
     userimg: null,
   });
 
-  // const initialState = {
-  //   name: userData ? (userData.name ? userData.name : "") : "",
-  //   dob: userData ? (userData.dob ? userData.dob.toDate() : "") : "",
-  //   phone: userData ? (userData.phone ? userData.phone : "") : "",
-  //   location: userData ? (userData.location ? userData.location : "") : "",
-  //   caption: userData ? (userData.caption ? userData.caption : "") : "",
-  // };
-
   React.useEffect(() => {
+    mounted.current = true;
     async function fetchData() {
       const data = await getUserData(user.uid);
-      setUserData({
-        name: data.name ? data.name : "",
-        dob: data.dob ? data.dob.toDate() : "",
-        phone: data.phone ? data.phone : "",
-        location: data.location ? data.location : "",
-        caption: data.caption ? data.caption : "",
-        userimg: data.userimg ? data.userimg : null,
-      });
+      if (mounted.current) {
+        setUserData({
+          name: data.name ? data.name : "",
+          dob: data.dob ? data.dob.toDate() : "",
+          phone: data.phone ? data.phone : "",
+          location: data.location ? data.location : "",
+          caption: data.caption ? data.caption : "",
+          userimg: data.userimg ? data.userimg : null,
+        });
+      }
     }
     fetchData();
+    return () => (mounted.current = false);
   }, []);
 
   const reducer = (state, action) => {

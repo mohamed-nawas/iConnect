@@ -1,5 +1,6 @@
 // firestore functions
 import firestore from "@react-native-firebase/firestore";
+import moment from "moment";
 
 export const createUser = (name, mail, phone, pwd, userid) => {
   firestore()
@@ -221,19 +222,202 @@ export const getUserData = async (userid) => {
   return response;
 };
 
-export const getPosts = async () => {
+export const getSortedChatUser = async (chatsarr) => {
+  const array = new Array();
+  const promises = chatsarr.map(async (c) => {
+    const userdata = await getUserData(c.userid);
+    array.push({
+      name: userdata.name,
+      userimg: userdata.userimg,
+      userid: c.userid,
+    });
+  });
+  await Promise.all(promises);
+
+  return array;
+};
+
+export const markMsgStatus = async (recieverid, chatid) => {
+  await firestore()
+    .collection("Messages")
+    .where("receiverid", "==", recieverid)
+    .where("chatid", "==", chatid)
+    .where("received", "==", false)
+    .get()
+    .then((querySnapshot) => {
+      querySnapshot.docs.forEach(async (doc) => {
+        await firestore()
+          .collection("Messages")
+          .doc(doc.id)
+          .update({
+            sent: true,
+            received: true,
+          })
+          .then(() => {
+            console.log("message updated");
+          })
+          .catch((e) => console.log(e));
+      });
+    })
+    .catch((e) => console.log(e));
+};
+
+export const createChat = async (userid1, userid2) => {
+  let response;
+
+  await firestore()
+    .collection("Chats")
+    .add({
+      userid1: userid1,
+      userid2: userid2,
+    })
+    .then((doc) => {
+      response = doc.id;
+    })
+    .catch((e) => console.log(e));
+
+  return response;
+};
+
+export const getChat = async (userid_1, userid_2) => {
+  let response;
+
+  const querySnapshot = await firestore()
+    .collection("Chats")
+    .where("userid1", "in", [userid_1, userid_2])
+    .get();
+  querySnapshot.forEach((doc) => {
+    const { userid2 } = doc.data();
+    if (userid2 === userid_1 || userid2 === userid_2) {
+      const data = doc.id;
+      response = data;
+    }
+  });
+
+  return response;
+};
+
+export const getUnreadMsgs = async (chatid, receiverid) => {
+  const querySnapshot = await firestore()
+    .collection("Messages")
+    .where("chatid", "==", chatid)
+    .where("receiverid", "==", receiverid)
+    .where("sent", "==", true)
+    .where("received", "==", false)
+    .get();
+
+  const result = querySnapshot.docs.length;
+  return result;
+};
+
+export const getChats = async (userid) => {
+  const response = new Array();
+
+  const querySnapshot = await firestore()
+    .collection("Chats")
+    .where("userid1", "==", userid)
+    .orderBy("latestmsg.createdAt", "desc")
+    .get();
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    const chatid = doc.id;
+    response.push({
+      chatid: chatid,
+      userid: data.userid2,
+      latestmsg: data.latestmsg.text,
+      latestmsgtime: moment(data.latestmsg.createdAt.toDate()).fromNow(true),
+      latestmsgsender: data.latestmsgsender,
+      latestmsgreceiver: data.latestmsgreceiver,
+      noofmsgs: data.noofmsgs,
+    });
+  });
+
+  const querySnapshot1 = await firestore()
+    .collection("Chats")
+    .where("userid2", "==", userid)
+    .orderBy("latestmsg.createdAt", "desc")
+    .get();
+  querySnapshot1.forEach((doc) => {
+    const data = doc.data();
+    const chatid = doc.id;
+    response.push({
+      chatid: chatid,
+      userid: data.userid1,
+      latestmsg: data.latestmsg.text,
+      latestmsgtime: moment(data.latestmsg.createdAt.toDate()).fromNow(true),
+      latestmsgsender: data.latestmsgsender,
+      latestmsgreceiver: data.latestmsgreceiver,
+      noofmsgs: data.noofmsgs,
+    });
+  });
+
+  return response;
+};
+
+export const getPosts = async (postsPerLoad) => {
   const posts = new Array();
 
   const querySnapshot = await firestore()
     .collection("Posts")
     .orderBy("posttime", "desc")
+    .limit(postsPerLoad)
     .get();
+  const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
   querySnapshot.forEach((doc) => {
     const data = doc.data();
     posts.push(data);
   });
 
-  return posts;
+  return { posts, lastVisible };
+};
+
+export const getMorePosts = async (startAfter, postsPerLoad) => {
+  const posts = new Array();
+  const querySnapshot = await firestore()
+    .collection("Posts")
+    .orderBy("posttime", "desc")
+    .startAfter(startAfter)
+    .limit(postsPerLoad)
+    .get();
+  const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    posts.push(data);
+  });
+  return { posts, lastVisible };
+};
+
+export const getUserPosts = async (userId, postsPerLoad) => {
+  const posts = new Array();
+  const querySnapshot = await firestore()
+    .collection("Posts")
+    .where("userid", "==", userId)
+    .orderBy("posttime", "desc")
+    .limit(postsPerLoad)
+    .get();
+  const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    posts.push(data);
+  });
+  return { posts, lastVisible };
+};
+
+export const getMoreUserPosts = async (userId, startAfter, postsPerLoad) => {
+  const posts = new Array();
+  const querySnapshot = await firestore()
+    .collection("Posts")
+    .where("userid", "==", userId)
+    .orderBy("posttime", "desc")
+    .startAfter(startAfter)
+    .limit(postsPerLoad)
+    .get();
+  const lastVisible = querySnapshot.docs[querySnapshot.docs.length - 1];
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    posts.push(data);
+  });
+  return { posts, lastVisible };
 };
 
 export const updateUser = (userid, userdata, imgurl) => {

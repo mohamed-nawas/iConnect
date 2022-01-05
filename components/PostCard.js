@@ -24,6 +24,7 @@ const PostCard = ({ item, onPress }) => {
   const [name, setName] = React.useState(null);
   const [location, setLocation] = React.useState(null);
   const { user } = React.useContext(AuthContext);
+  const mounted = React.useRef(true);
 
   let post = item.post;
   if (item.isprofile) {
@@ -32,13 +33,17 @@ const PostCard = ({ item, onPress }) => {
   const liked = true;
 
   React.useEffect(() => {
+    mounted.current = true;
     async function fetchUserData() {
       const data = await getUserData(item.userid);
-      setProfileimg(data.userimg);
-      setName(data.name);
-      setLocation(data.location);
+      if (mounted.current) {
+        setProfileimg(data.userimg);
+        setName(data.name);
+        setLocation(data.location);
+      }
     }
     fetchUserData();
+    return () => (mounted.current = false);
   }, []);
 
   return (
